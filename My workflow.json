@@ -1,0 +1,173 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "e4d11d1c-62db-4b1a-857f-61e0e058adbf",
+      "name": "Telegram Trigger",
+      "webhookId": "53028ba9-f26a-47fe-8c9a-61111e5dc2d8",
+      "credentials": {
+        "telegramApi": {
+          "id": "B843IFcPRJE4qWBf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        -128
+      ],
+      "id": "94b8a03a-2f57-46d6-9bb0-c008783dbf24",
+      "name": "Send a text message",
+      "webhookId": "cf68cf79-6358-41f5-bd6e-02785a71569b",
+      "credentials": {
+        "telegramApi": {
+          "id": "B843IFcPRJE4qWBf",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "You are a helpful AI assistant on Telegram.\n\nAnswer accurately, clearly, and naturally.\nKeep your answers concise unless the user asks for detail.\nRemember the conversation and use previous messages when relevant.\nAvoid unnecessary introductions."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "526454e4-fc80-4c86-b815-ab1dc592852f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        128,
+        112
+      ],
+      "id": "5ab1f93c-d959-4d7c-a9a4-7db3f2b56164",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-5-nano"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        96
+      ],
+      "id": "4233c95a-cbd1-4727-b493-7eeb3c2fc199",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "707a684f-623e-409c-868c-a25d829d7be7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a4a18d8b0bea1516ad4d6527294add8ccef4f1aeaed459230ba8988c6dedf687"
+  },
+  "nodeGroups": [],
+  "id": "1UzQGR3F1EKacRvt",
+  "tags": []
+}
